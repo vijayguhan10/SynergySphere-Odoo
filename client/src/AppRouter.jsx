@@ -5,7 +5,7 @@ import MainLayout from "./components/MainLayout";
 import Home from "./pages/Home";
 import ProjectsDashboard from "./pages/ProjectsDashboard";
 import Tasks from "./components/Tasks/Tasks"; // Import your Tasks component
-
+import Message from "./components/Message/Message";
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -18,7 +18,9 @@ const AppRouter = () => {
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<ProjectsDashboard />} />
-              <Route path="/tasks" element={<Tasks />} /> {/* Add this line */}
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/messages" element={<Message />} />
+               {/* Add this line */}
             </Route>
           </Routes>
         </main>
