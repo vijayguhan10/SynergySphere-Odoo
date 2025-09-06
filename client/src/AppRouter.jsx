@@ -6,7 +6,7 @@ import ProjectsDashboard from "./pages/ProjectsDashboard";
 import Tasks from "./components/Tasks/Tasks"; // Import your Tasks component
 import Message from "./components/Message/Message";
 import Notification from "./components/Notification/Notification";
-
+import User from "./components/Users/User";
 import Project from "./components/Projects/Project";
 const AppRouter = () => {
   return (
@@ -23,6 +23,7 @@ const AppRouter = () => {
               <Route path="/messages" element={<Message />} />
               <Route path="/notifications" element={<Notification />} />
               <Route path="/projects" element={<Project />} />
+              <Route path="/users" element={<User />} />
                {/* Add this line */}
             </Route>
           </Routes>

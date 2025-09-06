@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import { format } from "date-fns";
 
 // Helper to decode JWT and get userId
 const getUserIdFromToken = () => {
@@ -137,8 +138,10 @@ const Tasks = ({ projectId, assigneeId }) => {
       return false;
     });
 
+  // Enhanced card UI
   return (
-    <div className="p-2 sm:p-4 lg:p-6 bg-gray-50 min-h-screen">
+
+    <div className="p-2 sm:p-4 lg:p-6 bg-gradient-to-br from-purple-50 via-white to-blue-50 min-h-screen">
       <div className="flex flex-wrap items-center gap-2 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
         <button className="flex items-center gap-2 text-gray-700 font-medium">
           <ClipboardList size={20} />
@@ -199,10 +202,10 @@ const Tasks = ({ projectId, assigneeId }) => {
               </button>
             </div>
             <div className="space-y-2 sm:space-y-4">
-              {getTasksByStatus(col.label).map((task, idx) => (
+              {getTasksByStatus(col.label).map((task) => (
                 <div
                   key={task.id}
-                  className="bg-white rounded-xl shadow-sm border p-3 sm:p-4"
+                  className="bg-white rounded-2xl shadow-lg border p-5 transition hover:shadow-xl"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     {task.tags &&
@@ -217,23 +220,23 @@ const Tasks = ({ projectId, assigneeId }) => {
                         </span>
                       ))}
                     <span className="ml-auto text-xs font-bold text-gray-400">
-                      {task.id}
+                      #{task.id}
                     </span>
                   </div>
                   {editingTaskId === task.id ? (
                     <>
                       <input
-                        className="font-semibold text-sm sm:text-base mb-1 truncate w-full border rounded px-2 py-1"
+                        className="font-semibold text-base mb-2 w-full border rounded px-2 py-1"
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
                       />
                       <textarea
-                        className="text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3 truncate w-full border rounded px-2 py-1"
+                        className="text-gray-500 text-sm mb-2 w-full border rounded px-2 py-1"
                         value={editDesc}
                         onChange={(e) => setEditDesc(e.target.value)}
                       />
                       <select
-                        className="mb-2 px-2 py-1 rounded border"
+                        className="mb-2 px-2 py-1 rounded border w-full"
                         value={editStatus}
                         onChange={(e) => setEditStatus(e.target.value)}
                       >
@@ -243,7 +246,7 @@ const Tasks = ({ projectId, assigneeId }) => {
                         <option value="COMPLETED">Completed</option>
                       </select>
                       <button
-                        className="flex items-center gap-2 px-3 py-1 rounded bg-green-600 text-white"
+                        className="flex items-center gap-2 px-4 py-2 rounded bg-green-600 text-white font-semibold shadow hover:bg-green-700"
                         onClick={() => saveEdit(task)}
                         type="button"
                       >
@@ -253,33 +256,47 @@ const Tasks = ({ projectId, assigneeId }) => {
                     </>
                   ) : (
                     <>
-                      <div className="font-semibold text-sm sm:text-base mb-1 truncate">
+                      <div className="font-semibold text-lg mb-1">
                         {task.title}
                       </div>
-                      <div className="text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3 truncate">
+                      <div className="text-gray-500 text-sm mb-2">
                         {task.description}
                       </div>
-                      <div className="mb-2 sm:mb-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Status</span>
-                          <span className="text-xs text-gray-500">
-                            {task.status}
-                          </span>
-                        </div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">
+                          Status:{" "}
+                          <span className="font-semibold">{task.status}</span>
+                        </span>
+                        <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">
+                          Due:{" "}
+                          {task.dueDate
+                            ? format(new Date(task.dueDate), "dd MMM yyyy")
+                            : "No due"}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs">
+                          Project: {task.project?.name || "N/A"}
+                        </span>
+                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs flex items-center gap-1">
+                          <Users size={14} />
+                          Assignee: {task.assignee?.name || "Unassigned"}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex -space-x-2">
                           <img
                             src={
                               userAvatars[
-                                (task.assigneeId - 1) % userAvatars.length
+                                ((task.assigneeId || 1) - 1) %
+                                  userAvatars.length
                               ]
                             }
                             alt="User"
-                            className="w-6 h-6 rounded-full border-2 border-white shadow"
+                            className="w-7 h-7 rounded-full border-2 border-white shadow"
                           />
                         </div>
-                        <div className="flex items-center gap-2 sm:gap-4 text-gray-400">
+                        <div className="flex items-center gap-4 text-gray-400">
                           <Eye size={16} />
                           <span className="text-xs">{task.views || 0}</span>
                           <MessageCircle size={16} />
@@ -302,6 +319,9 @@ const Tasks = ({ projectId, assigneeId }) => {
             </div>
           </div>
         ))}
+      </div>
+      <div>
+        <ToastContainer position="top-right" autoClose={3000} className={`z-50`} />
       </div>
     </div>
   );
