@@ -2,35 +2,7 @@ import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
-
-// Mock data for projects (replace with real API data later)
-const projects = [
-  {
-    id: 1,
-    name: "Website Redesign",
-    stats: { total: 24, completed: 16, members: 6 },
-  },
-  {
-    id: 2,
-    name: "Mobile App Launch",
-    stats: { total: 18, completed: 10, members: 4 },
-  },
-  {
-    id: 3,
-    name: "Marketing Campaign",
-    stats: { total: 12, completed: 7, members: 3 },
-  },
-  {
-    id: 4,
-    name: "Customer Onboarding",
-    stats: { total: 9, completed: 9, members: 2 },
-  },
-  {
-    id: 5,
-    name: "Data Migration",
-    stats: { total: 30, completed: 4, members: 5 },
-  },
-];
+import { projects as sampleProjects } from "../data/sampleData";
 
 const ProjectsDashboard = () => {
   const [selected, setSelected] = useState(null);
@@ -75,7 +47,7 @@ const ProjectsDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((p) => (
+        {sampleProjects.map((p) => (
           <article
             key={p.id}
             className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition cursor-pointer"
@@ -140,12 +112,7 @@ const ProjectsDashboard = () => {
         ))}
       </div>
 
-      <ProjectDetailsModal
-        open={open}
-        project={selected}
-        onClose={close}
-        mode={selected ? "view" : "view"}
-      />
+      <ProjectDetailsModal open={open} project={selected} onClose={close} />
 
       {/* Floating action button for mobile */}
       <button className="fixed bottom-6 right-6 sm:hidden bg-blue-600 text-white p-4 rounded-full shadow-lg">
