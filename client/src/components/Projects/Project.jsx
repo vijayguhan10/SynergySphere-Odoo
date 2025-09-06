@@ -13,134 +13,11 @@ import {
   Eye,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-const projects = [
-  "All Projects",
-  "Design Agency Website",
-  "Fintech App",
-  "Online Catalog Development",
-  "Neobank App Case",
-];
-
-const boardData = [
-  {
-    status: "To Do",
-    count: 3,
-    cards: [
-      {
-        tags: ["Dribbble", "Design"],
-        title: "Project Management Wep App",
-        description:
-          "Make a design for a web application for organizing the workspace of an IT company",
-        date: "30 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 2,
-        views: 1,
-      },
-      {
-        tags: ["Behance", "Design"],
-        title: "Neobank App Case",
-        description:
-          "It should include wireframes, user flows, and visual design elements that demonstrate how the app delivers a seamless and modern banking experience",
-        date: "5 Feb",
-        avatars: [0, 1, 2, 3],
-        comments: 8,
-        views: 3,
-      },
-      {
-        tags: ["Design", "Dev"],
-        title: "Design Agency Website",
-        description:
-          "The design should be responsive, ensuring optimal performance across all devices and screen sizes. Example...",
-        date: "9 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 6,
-        views: 3,
-      },
-    ],
-  },
-  {
-    status: "In Progress",
-    count: 2,
-    cards: [
-      {
-        tags: ["Dribbble", "Design"],
-        title: "Speaking App",
-        description:
-          "Create a mobile application design for language exchange. The purpose of the application is to help users learn foreign languages",
-        date: "30 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 6,
-        views: 2,
-      },
-      {
-        tags: ["Dev", "Design"],
-        title: "Online Catalog Development",
-        description:
-          "Develop an online employee directory for a company with more than 50,000 employees. When performing a task, you need to additionally use any third-party Python and/or JS/CSS libraries, without any restrictions",
-        date: "3 Feb",
-        avatars: [0, 1, 2, 3],
-        comments: 6,
-        views: 3,
-      },
-    ],
-  },
-  {
-    status: "Review",
-    count: 2,
-    cards: [
-      {
-        tags: ["Research", "Design"],
-        title: "Administrator Panel Interface",
-        description:
-          "Develop an interface for the administrator to manage the rights of the company's users to various products (projects) of the company",
-        date: "24 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 3,
-        views: 1,
-      },
-      {
-        tags: ["Design"],
-        title: "Fintech App",
-        description:
-          "The goal is to create an intuitive, user-friendly, and visually appealing design that simplifies complex financial transactions",
-        date: "23 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 5,
-        views: 5,
-        image:
-          "https://cdn.dribbble.com/users/240025/screenshots/20709999/media/1e3e2e3e3e3e3e3e3e3e3e3e3e3e3e3e.png",
-      },
-    ],
-  },
-  {
-    status: "Complete",
-    count: 2,
-    cards: [
-      {
-        tags: ["Dribbble", "Design"],
-        title: "Finance Manager",
-        description:
-          "Make a design for a web application for organizing the workspace of an IT company",
-        date: "12 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 2,
-        views: 1,
-      },
-      {
-        tags: ["Research", "Design"],
-        title: "Fashion Website",
-        description:
-          "The design should be luxurious, emphasizing craftsmanship, and the quality of materials.",
-        date: "9 Jan",
-        avatars: [0, 1, 2, 3],
-        comments: 5,
-        views: 5,
-      },
-    ],
-  },
-];
+// board columns will be derived from backend tasks; no static board data
 
 const tagColors = {
   Dribbble: "bg-pink-100 text-pink-600",
@@ -158,20 +35,176 @@ const userAvatars = [
 ];
 
 const Project = () => {
-  const [selectedProject, setSelectedProject] = useState("All Projects");
+  // selectedProject holds either 'all' or a project id (number/string)
+  const [selectedProject, setSelectedProject] = useState("all");
   const [search, setSearch] = useState("");
+  const [projects, setProjects] = useState([]); // array of {id,name,...}
+  const [projectDetails, setProjectDetails] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
 
-  // Filter logic
-  const filteredBoardData = boardData.map((col) => ({
+  // When viewing "All Projects", aggregate tasks from the fetched projects list.
+  const effectiveTasks =
+    selectedProject === "all"
+      ? projects.flatMap((p) => (Array.isArray(p.tasks) ? p.tasks : []))
+      : tasks;
+
+  useEffect(() => {
+    let mounted = true;
+    const ctrl = new AbortController();
+
+    axios
+      .get(`${import.meta.env.VITE_BASE_URL}/projects/getall`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+        },
+        signal: ctrl.signal,
+      })
+      .then((res) => {
+        if (!mounted) return;
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setProjects(data);
+        }
+      })
+      .catch((err) => {
+        // Ignore cancellations triggered by AbortController
+        if (err?.code === "ERR_CANCELED" || err?.name === "CanceledError")
+          return;
+        console.error("Failed to load projects:", err);
+        toast.error(err.response?.data?.message || "Failed to fetch projects.");
+      });
+
+    return () => {
+      mounted = false;
+      ctrl.abort();
+    };
+  }, []);
+
+  // When a project is selected (by id), fetch its details and tasks
+  useEffect(() => {
+    if (selectedProject === "all") {
+      setProjectDetails(null);
+      setTasks([]);
+      return;
+    }
+
+    const id = selectedProject;
+    let mounted = true;
+    const ctrl = new AbortController();
+
+    const fetchData = async () => {
+      setLoadingTasks(true);
+      try {
+        const [projRes, tasksRes] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_BASE_URL}/projects/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+            },
+            signal: ctrl.signal,
+          }),
+          axios.get(`${import.meta.env.VITE_BASE_URL}/tasks/project/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+            },
+            signal: ctrl.signal,
+          }),
+        ]);
+
+        if (!mounted) return;
+        setProjectDetails(projRes.data || null);
+        // tasks endpoint returns { data: [ ... ] }
+        const t = Array.isArray(tasksRes.data?.data) ? tasksRes.data.data : [];
+        setTasks(t);
+      } catch (err) {
+        // Ignore cancellations
+        if (err?.code === "ERR_CANCELED" || err?.name === "CanceledError") {
+          if (mounted) setLoadingTasks(false);
+          return;
+        }
+        console.error("Failed to load project/tasks:", err);
+        toast.error(
+          err.response?.data?.message || "Failed to fetch project or tasks."
+        );
+        setProjectDetails(null);
+        setTasks([]);
+      } finally {
+        if (mounted) setLoadingTasks(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      mounted = false;
+      ctrl.abort();
+    };
+  }, [selectedProject]);
+
+  // Build board data from fetched tasks when a project is selected
+  const taskToCard = (task) => ({
+    tags: [],
+    title: task.title,
+    description: task.description || "",
+    date: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "",
+    avatars: task.assignee ? [task.assignee.id] : [],
+    comments: 0,
+    views: 0,
+  });
+
+  const columnsFromTasks = () => {
+    const groups = {
+      todo: [],
+      inprogress: [],
+      review: [],
+      complete: [],
+    };
+
+    effectiveTasks.forEach((t) => {
+      const status = (t.status || "").toLowerCase();
+      if (status.includes("todo") || status === "todo") groups.todo.push(t);
+      else if (status.includes("progress") || status === "in_progress")
+        groups.inprogress.push(t);
+      else if (status.includes("review")) groups.review.push(t);
+      else groups.complete.push(t);
+    });
+
+    return [
+      {
+        status: "To Do",
+        count: groups.todo.length,
+        cards: groups.todo.map(taskToCard),
+      },
+      {
+        status: "In Progress",
+        count: groups.inprogress.length,
+        cards: groups.inprogress.map(taskToCard),
+      },
+      {
+        status: "Review",
+        count: groups.review.length,
+        cards: groups.review.map(taskToCard),
+      },
+      {
+        status: "Complete",
+        count: groups.complete.length,
+        cards: groups.complete.map(taskToCard),
+      },
+    ];
+  };
+
+  const filteredBoardData = columnsFromTasks().map((col) => ({
     ...col,
-    cards: col.cards.filter(
-      (card) =>
-        (selectedProject === "All Projects" ||
-          card.title === selectedProject) &&
-        (search === "" ||
-          card.title.toLowerCase().includes(search.toLowerCase()) ||
-          card.description.toLowerCase().includes(search.toLowerCase()))
-    ),
+    cards: col.cards.filter((card) => {
+      // Only filter cards by the search query. Project selection determines
+      // whether we use the static board (`all`) or task-derived columns.
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (
+        String(card.title).toLowerCase().includes(q) ||
+        String(card.description).toLowerCase().includes(q)
+      );
+    }),
   }));
 
   return (
@@ -221,9 +254,10 @@ const Project = () => {
           onChange={(e) => setSelectedProject(e.target.value)}
           className="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium"
         >
+          <option value="all">All Projects</option>
           {projects.map((proj) => (
-            <option key={proj} value={proj}>
-              {proj}
+            <option key={proj.id} value={proj.id}>
+              {proj.name || proj.title || `Project ${proj.id}`}
             </option>
           ))}
         </select>
