@@ -1,5 +1,7 @@
+// prisma/schema.prisma
+
 datasource db {
-  provider = "mysql"
+  provider = "postgresql" // or "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -7,10 +9,85 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// ==================== USERS ====================
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
+  id           Int             @id @default(autoincrement())
+  name         String
+  email        String          @unique
+  password     String
+  projects     ProjectMember[]
+  tasks        Task[]          @relation("AssignedTasks")
+  messages     Message[]
+  createdAt    DateTime        @default(now())
+  Project      Project[]
+  Notification Notification[]
+}
+
+// ==================== PROJECTS ====================
+model Project {
+  id          Int             @id @default(autoincrement())
+  name        String
+  description String?
+  ownerId     Int
+  owner       User            @relation(fields: [ownerId], references: [id])
+  members     ProjectMember[]
+  tasks       Task[]
+  messages    Message[]
+  createdAt   DateTime        @default(now())
+}
+
+// ==================== PROJECT MEMBERS ====================
+model ProjectMember {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  projectId Int
+  role      String // e.g. "admin", "member"
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+// ==================== TASKS ====================
+model Task {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  dueDate     DateTime?
+  projectId   Int
+  assigneeId  Int?
+
+  project   Project  @relation(fields: [projectId], references: [id])
+  assignee  User?    @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// Enum for Task Status
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+// ==================== MESSAGES (Project Discussions) ====================
+model Message {
+  id        Int    @id @default(autoincrement())
+  content   String
+  projectId Int
+  userId    Int
+
+  project   Project  @relation(fields: [projectId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// ==================== NOTIFICATIONS ====================
+model Notification {
+  id      Int     @id @default(autoincrement())
+  userId  Int
+  content String
+  read    Boolean @default(false)
+
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }
