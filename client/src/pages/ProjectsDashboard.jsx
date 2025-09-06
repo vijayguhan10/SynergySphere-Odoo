@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import ProjectDetailsModal from "../components/ProjectDetailsModal";
+import ProjectDetailsModal from "../components/dashboard/ProjectDetailsModal";
 import { projects as sampleProjects } from "../data/sampleData";
 
 const ProjectsDashboard = () => {
