@@ -62,6 +62,7 @@ exports.getMessageById = async (req, res) => {
     if (!membership && message.project.ownerId !== userId) return res.status(403).json({ message: 'Not a project member' });
     return res.status(200).json({ data: message });
   } catch (error) {
+       
     return res.status(500).json({ message: 'Failed to fetch message', error: error.message });
   }
 };
