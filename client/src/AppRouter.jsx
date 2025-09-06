@@ -1,25 +1,28 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import Auth from "./pages/Login";
 import MainLayout from "./components/MainLayout";
 import Home from "./pages/Home";
 import ProjectsDashboard from "./pages/ProjectsDashboard";
 import Tasks from "./components/Tasks/Tasks"; // Import your Tasks component
 import Message from "./components/Message/Message";
+import Notification from "./components/Notification/Notification";
+
+import Project from "./components/Projects/Project";
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <div className=" bg-gray-100">
         <main className="">
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Auth />} />
 
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<ProjectsDashboard />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/messages" element={<Message />} />
+              <Route path="/notifications" element={<Notification />} />
+              <Route path="/projects" element={<Project />} />
                {/* Add this line */}
             </Route>
           </Routes>
