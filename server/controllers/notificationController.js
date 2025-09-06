@@ -1,9 +1,9 @@
 const prisma = require('../Config/db');
 
 exports.createNotification = async (req, res) => {
-  const { userId, message, type } = req.body;
-  if (!userId || !message || !type) {
-    return res.status(400).json({ message: 'userId, message, and type are required.' });
+  const { userId, content } = req.body;
+  if (!userId || !content) {
+    return res.status(400).json({ message: 'userId and content are required.' });
   }
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -11,7 +11,7 @@ exports.createNotification = async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
     const notification = await prisma.notification.create({
-      data: { userId, message, type }
+      data: { userId, content }
     });
     res.status(201).json({ message: 'Notification created', data: notification });
   } catch (error) {
