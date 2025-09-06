@@ -2,11 +2,14 @@ import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProjectDetailsModal from "../components/dashboard/ProjectDetailsModal";
+import ProjectCreateModal from "../components/dashboard/ProjectCreateModal";
 import { projects as sampleProjects } from "../data/sampleData";
 
 const ProjectsDashboard = () => {
   const [selected, setSelected] = useState(null);
   const [open, setOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [projects, setProjects] = useState(sampleProjects || []);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -19,6 +22,13 @@ const ProjectsDashboard = () => {
   const openProject = (p) => {
     setSelected(p);
     setOpen(true);
+  };
+
+  const openCreate = () => setCreateOpen(true);
+
+  const handleCreateSave = (project) => {
+    setProjects((prev) => [project, ...prev]);
+    setCreateOpen(false);
   };
 
   const close = () => {
@@ -39,7 +49,10 @@ const ProjectsDashboard = () => {
           </p>
         </div>
         <div className="hidden sm:flex items-center gap-2">
-          <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
+          <button
+            onClick={openCreate}
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+          >
             <Plus size={16} />
             New Project
           </button>
@@ -47,7 +60,7 @@ const ProjectsDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sampleProjects.map((p) => (
+        {projects.map((p) => (
           <article
             key={p.id}
             className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition cursor-pointer"
@@ -113,18 +126,19 @@ const ProjectsDashboard = () => {
       </div>
 
       <ProjectDetailsModal open={open} project={selected} onClose={close} />
+      <ProjectCreateModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onSave={handleCreateSave}
+      />
 
       {/* Floating action button for mobile */}
-      <button className="fixed bottom-6 right-6 sm:hidden bg-blue-600 text-white p-4 rounded-full shadow-lg">
+      <button
+        onClick={openCreate}
+        className="fixed bottom-6 right-6 sm:hidden bg-blue-600 text-white p-4 rounded-full shadow-lg"
+      >
         <Plus size={20} />
       </button>
-
-      {/* Prominent new project button for small screens below the grid */}
-      <div className="sm:hidden mt-6">
-        <button className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-3 rounded-lg shadow hover:bg-blue-700">
-          <Plus size={16} /> Create Project
-        </button>
-      </div>
     </div>
   );
 };
