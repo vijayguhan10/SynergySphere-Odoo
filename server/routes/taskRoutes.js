@@ -10,5 +10,6 @@ router.get('/project/:projectId', authMiddleware, taskController.getTasksByProje
 router.get('/assignee/:assigneeId', authMiddleware, taskController.getTasksByAssignee);
 router.put('/:id', authMiddleware, taskController.updateTask);
 router.delete('/:id', authMiddleware, taskController.deleteTask);
+router.get('/', authMiddleware, taskController.getAllTasks);
 
 module.exports = router;

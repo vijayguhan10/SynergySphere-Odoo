@@ -130,3 +130,15 @@ exports.deleteTask = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete task.', error: error.message });
   }
 };
+
+exports.getAllTasks = async (req, res) => {
+  try {
+    const tasks = await prisma.task.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { project: true, assignee: true }
+    });
+    res.json({ data: tasks });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch all tasks.', error: error.message });
+  }
+};
