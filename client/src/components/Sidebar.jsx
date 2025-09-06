@@ -3,7 +3,7 @@ import { FaRobot } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/admin-dashboard" },
+  { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Settings", icon: Settings, path: "/settings" },
   { name: "Files/Documents", icon: FolderOpen, path: "/asset-management" },
   { name: "Ai Visualizer", icon: FaRobot, path: "/ai-visualizer" },

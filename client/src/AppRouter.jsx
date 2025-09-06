@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import MainLayout from "./components/MainLayout";
 import Home from "./pages/Home";
+import ProjectsDashboard from "./pages/ProjectsDashboard";
 
 const AppRouter = () => {
   return (
@@ -16,6 +17,7 @@ const AppRouter = () => {
             {/* All other routes use the main layout */}
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<ProjectsDashboard />} />
               {/* add other app routes here, they will render inside MainLayout */}
             </Route>
           </Routes>
