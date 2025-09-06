@@ -1,12 +1,24 @@
-import { LayoutDashboard, Settings, FolderOpen, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Settings,
+  FolderOpen,
+  LogOut,
+  ListChecks,
+  MessageSquare,
+  Bell,
+  Users,
+} from "lucide-react";
 import { FaRobot } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-
+  { name: "Tasks", icon: ListChecks, path: "/tasks" },
+  { name: "Messages", icon: MessageSquare, path: "/messages" },
+  { name: "Projects", icon: FolderOpen, path: "/projects" },
+  { name: "Notifications", icon: Bell, path: "/notifications" },
+  { name: "Users", icon: Users, path: "/users" },
 ];
-
 
 const SideBar = ({ isOpen = false, setIsOpen = () => {} }) => {
   const navigate = useNavigate();
