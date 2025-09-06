@@ -4,6 +4,7 @@ import ModalHeader from "./ModalHeader";
 import ProjectOverview from "./ProjectOverview";
 import ProjectTasks from "./ProjectTasks";
 import TaskModal from "./TaskModal";
+import TaskDetailModal from "./TaskDetailModal";
 
 const ProjectDetailsModal = ({
   open,
@@ -39,6 +40,19 @@ const ProjectDetailsModal = ({
     // prepend the new task so it appears at the top
     setTasks((prev) => [task, ...prev]);
     setTaskModalOpen(false);
+  };
+
+  const [taskDetailOpen, setTaskDetailOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const handleOpenTaskDetail = (task) => {
+    setSelectedTask(task);
+    setTaskDetailOpen(true);
+  };
+
+  const handleSaveTaskDetail = (updated) => {
+    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+    setTaskDetailOpen(false);
   };
 
   const toggleTask = (id) =>
@@ -161,12 +175,19 @@ const ProjectDetailsModal = ({
                     setFilter={setFilter}
                     toggleTask={toggleTask}
                     onAddClick={handleAddClick}
+                    onOpenTask={handleOpenTaskDetail}
                   />
                   <TaskModal
                     open={taskModalOpen}
                     onClose={() => setTaskModalOpen(false)}
                     onSave={handleSaveTask}
                     project={project}
+                  />
+                  <TaskDetailModal
+                    open={taskDetailOpen}
+                    onClose={() => setTaskDetailOpen(false)}
+                    task={selectedTask}
+                    onSave={handleSaveTaskDetail}
                   />
                 </>
               )}

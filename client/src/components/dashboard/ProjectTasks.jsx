@@ -8,6 +8,7 @@ const ProjectTasks = ({
   setFilter,
   toggleTask,
   onAddClick,
+  onOpenTask,
 }) => {
   return (
     <div>
@@ -79,12 +80,19 @@ const ProjectTasks = ({
           .map((t) => (
             <div
               key={t.id}
-              onClick={() => toggleTask(t.id)}
-              className={`cursor-pointer bg-white border rounded-lg p-3 flex items-center justify-between hover:shadow-sm transition ${
+              className={`group bg-white border rounded-lg p-3 flex items-center justify-between hover:shadow-sm transition ${
                 t.completed ? "opacity-70" : ""
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div
+                className="flex items-center gap-3 flex-1 cursor-pointer"
+                onClick={() => onOpenTask && onOpenTask(t)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onOpenTask && onOpenTask(t);
+                }}
+              >
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-700">
                   {t.assignee?.initials ??
                     t.assignee?.name?.slice(0, 2).toUpperCase()}
@@ -104,12 +112,33 @@ const ProjectTasks = ({
                   </div>
                 </div>
               </div>
-              <div
-                className={`text-sm ${
-                  t.completed ? "text-green-600" : "text-gray-500"
-                }`}
-              >
-                {t.completed ? "Done" : "Open"}
+
+              <div className="ml-3">
+                <button
+                  onClick={() => toggleTask(t.id)}
+                  aria-pressed={t.completed}
+                  className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm ${
+                    t.completed
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-700"
+                  } cursor-pointer hover:brightness-95`}
+                >
+                  <span
+                    className={`inline-flex items-center p-0.5 rounded-full ${
+                      t.completed ? "bg-green-500" : "bg-gray-300"
+                    }`}
+                    aria-hidden
+                  >
+                    <span
+                      className={`block w-3 h-3 bg-white rounded-full transform transition-transform ${
+                        t.completed ? "translate-x-2" : ""
+                      }`}
+                    />
+                  </span>
+                  <span className="select-none">
+                    {t.completed ? "Done" : "Open"}
+                  </span>
+                </button>
               </div>
             </div>
           ))}
