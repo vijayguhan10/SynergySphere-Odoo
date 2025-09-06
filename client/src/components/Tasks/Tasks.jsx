@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { format } from "date-fns";
 
 // Helper to decode JWT and get userId
@@ -140,7 +140,6 @@ const Tasks = ({ projectId, assigneeId }) => {
 
   // Enhanced card UI
   return (
-
     <div className="p-2 sm:p-4 lg:p-6 bg-gradient-to-br from-purple-50 via-white to-blue-50 min-h-screen">
       <div className="flex flex-wrap items-center gap-2 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
         <button className="flex items-center gap-2 text-gray-700 font-medium">
@@ -321,7 +320,7 @@ const Tasks = ({ projectId, assigneeId }) => {
         ))}
       </div>
       <div>
-        <ToastContainer position="top-right" autoClose={3000} className={`z-50`} />
+        {/* Toasts are handled globally via App-level ToastContainer */}
       </div>
     </div>
   );
