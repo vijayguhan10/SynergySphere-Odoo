@@ -1,4 +1,5 @@
 const prisma = require('../Config/db');
+const nodemailer = require("nodemailer");
 
 // Project controller
 exports.createProject = async (req, res) => {
@@ -21,7 +22,60 @@ exports.createProject = async (req, res) => {
         }
       }
     });
-    res.status(201).json(project);
+
+    // Send email notification
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "vijayguhan10@gmail.com", // replace with your email
+        pass: "bllt popo ekpi kjvd",   // use app password for Gmail
+      },
+    });
+
+    await transporter.sendMail({
+      from: '"SynergySphere" <vijayguhan10@gmail.com>',
+      to: "vijayguhan10@gmail.com",
+      subject: "🎉 Project Created Successfully | SynergySphere - Odoo",
+      text: `Project "${project.name}" was created successfully!`,
+      html: `
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f6f8fa; padding: 32px;">
+          <div style="max-width: 480px; margin: auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); overflow: hidden;">
+            <div style="background: linear-gradient(90deg,#4f8cff,#6dd5ed); padding: 24px 0; text-align: center;">
+              <img src="https://cdn-icons-png.flaticon.com/512/5957/5957425.png" alt="SynergySphere Logo" style="height: 48px; margin-bottom: 12px;" />
+              <h2 style="color: #fff; margin: 0; font-size: 1.6rem;">SynergySphere - Odoo</h2>
+              <p style="color: #e0f7fa; margin: 0; font-size: 1rem;">Project Management Platform</p>
+            </div>
+            <div style="padding: 32px 24px;">
+              <h3 style="color: #2d3748; margin-bottom: 16px;">🎉 Project Created Successfully!</h3>
+              <p style="color: #4a5568; font-size: 1rem;">
+                Your new project <b style="color: #2563eb;">"${project.name}"</b> has been created.<br/>
+                <span style="color: #6b7280;">${project.description || ""}</span>
+              </p>
+              <div style="margin: 24px 0;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">Project Owner:</td>
+                    <td style="padding: 8px 0; color: #2563eb; font-weight: 500;">${owner.name} (${owner.email})</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">Created At:</td>
+                    <td style="padding: 8px 0; color: #2563eb;">${new Date().toLocaleString()}</td>
+                  </tr>
+                </table>
+              </div>
+              <a href="https://synergysphere.odoo.com" style="display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; margin-top: 12px;">
+                Go to Dashboard
+              </a>
+            </div>
+            <div style="background: #f1f5f9; padding: 16px; text-align: center; color: #94a3b8; font-size: 0.95rem;">
+              This is an automated notification from SynergySphere - Odoo.
+            </div>
+          </div>
+        </div>
+      `,
+    });
+
+    res.status(201).json({ data: project, message: "Project created and email sent!" });
   } catch (error) {
     res.status(500).json({ message: 'Project creation failed.', error: error.message });
   }

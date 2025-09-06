@@ -63,16 +63,18 @@ function Auth() {
         {/* Left Side - Form */}
         <div className="p-8 lg:p-12 flex flex-col justify-center">
           <div className="mb-8">
+            {/* Changed logo to a generic project management icon */}
             <img
-              src="https://acs-liard.vercel.app/assets/ACS-OQj0FHDk.jpg"
-              alt="Lead Management Logo"
+              src="https://cdn-icons-png.flaticon.com/512/5957/5957425.png"
+              alt="SynergySphere Odoo Logo"
               className="h-16 mx-auto"
             />
             <h1 className="text-3xl mt-3 text-center text-gray-800 font-bold">
-              Welcome to Lead Management
+              Welcome to SynergySphere - Odoo
             </h1>
             <p className="text-center text-gray-500 mt-2">
-              Manage your leads, telecallers, and admins efficiently.
+              Project Management Platform for teams, tasks, and business
+              automation.
             </p>
           </div>
 
@@ -199,14 +201,15 @@ function Auth() {
               className="w-[85%] h-full rounded-r-2xl"
               style={{ minHeight: "300px", border: "none" }}
               allowFullScreen
-              title="Lead Management Animation"
+              title="SynergySphere Animation"
             />{" "}
             <div className="absolute bottom-2 left-10  bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
               <h3 className="font-semibold text-blue-700">
-                Your leads, your rules
+                SynergySphere - Odoo Project Management
               </h3>
               <p className="text-sm text-gray-600">
-                Your lead data belongs to you, and our encryption ensures that.
+                Your project data belongs to you, and our platform ensures
+                security and collaboration.
               </p>
             </div>
           </div>
