@@ -1,47 +1,84 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
 import { X, User, Calendar, FileText } from "lucide-react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const TaskModal = ({ open, onClose, onSave, project }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [assigneeInput, setAssigneeInput] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [users, setUsers] = useState([]);
+
+  // Fetch users for assignee dropdown
+  useEffect(() => {
+    if (open) {
+      axios
+        .get(`${import.meta.env.VITE_BASE_URL}/users`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+          },
+        })
+        .then((res) => setUsers(res.data.data || []))
+        .catch(() => setUsers([]));
+    }
+  }, [open]);
 
   // derive members from project if available, otherwise generate placeholders
   const members = useMemo(() => {
+    if (users.length) return users;
     if (project && Array.isArray(project.members) && project.members.length)
-      return project.members;
+      return project.members.map((m) => m.user || m);
     const count = project?.stats?.members ?? 3;
     return Array.from({ length: count }, (_, i) => ({
       name: `Member ${i + 1}`,
-      initials: `M${i + 1}`,
+      id: i + 1,
     }));
-  }, [project]);
+  }, [users, project]);
 
   if (!open) return null;
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
-    const chosen = members.find((m) => m.name === assigneeInput) || {
-      name: assigneeInput || "Unassigned",
-      initials: (assigneeInput || "U").slice(0, 2).toUpperCase(),
-    };
-    const task = {
-      id: Date.now(),
-      title: title.trim(),
-      description: description.trim(),
-      assignee: chosen,
-      dueDate: dueDate || null,
-      completed: false,
-    };
-    onSave(task);
-    // reset
-    setTitle("");
-    setDescription("");
-    setAssigneeInput("");
-    setDueDate("");
+    if (!title.trim()) return toast.error("Title is required!");
+    const assignee =
+      members.find(
+        (m) =>
+          m.name === assigneeInput ||
+          m.email === assigneeInput ||
+          String(m.id) === assigneeInput
+      ) || {};
+    const assigneeId = assignee.id || "";
+    if (!assigneeId) return toast.error("Please select a valid assignee!");
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/tasks/create`,
+        {
+          title: title.trim(),
+          description: description.trim(),
+          status: "TODO",
+          dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+          projectId: project?.id,
+          assigneeId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+          },
+        }
+      );
+      toast.success("Task created successfully!");
+      onSave && onSave();
+      setTitle("");
+      setDescription("");
+      setAssigneeInput("");
+      setDueDate("");
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to create task.");
+    }
   };
 
   return (
@@ -123,7 +160,7 @@ const TaskModal = ({ open, onClose, onSave, project }) => {
                 htmlFor="task-assignee"
                 className="block text-sm font-medium text-gray-700"
               >
-                Assignee
+                Assignee <span className="text-red-500">*</span>
               </label>
               <div className="mt-2 relative">
                 <div className="absolute left-3 top-2 text-gray-400">
@@ -136,10 +173,11 @@ const TaskModal = ({ open, onClose, onSave, project }) => {
                   onChange={(e) => setAssigneeInput(e.target.value)}
                   className="pl-10 pr-3 w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   placeholder="Search or type a name"
+                  required
                 />
                 <datalist id="assignees">
                   {members.map((m) => (
-                    <option key={m.name} value={m.name} />
+                    <option key={m.id} value={m.name} />
                   ))}
                 </datalist>
               </div>

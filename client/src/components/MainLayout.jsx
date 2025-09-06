@@ -7,7 +7,7 @@ const MainLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="text-xl bg-gray-100">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className="md:pl-64 flex flex-col min-h-screen pt-14 md:pt-14">
         <Header isOpen={isOpen} setIsOpen={setIsOpen} />

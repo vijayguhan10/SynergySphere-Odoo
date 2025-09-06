@@ -1,7 +1,11 @@
 import AppRouter from "./AppRouter";
 
 const App = () => {
-  return <AppRouter />;
+  return (
+    <div className="font-sans text-lg">
+      <AppRouter />
+    </div>
+  );
 };
 
 export default App;
