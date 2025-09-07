@@ -60,28 +60,28 @@ SynergySphere is a collaborative project management platform built with a modern
 
 ---
 
-## 📚 API Collections
+## 📚 API Documentation
 
-All API endpoints are documented and testable via Postman.  
+All API endpoints are documented and testable via Postman Documenter.  
 **Use the links below to explore and test each module:**
 
-- **User Management:**  
-  [User API Collection](https://odoo-synergysphere.postman.co/workspace/Team-Workspace~40f9dd26-5c9c-4e42-89e4-3fdad0248a13/collection/47243272-0f128185-b874-4b04-a3cd-2a0638c72d07?action=share&source=copy-link&creator=47243272)
+- **Project:**  
+  [Project API Documentation](https://documenter.getpostman.com/view/47243272/2sB3HkrM7m)
 
-- **Messaging:**  
-  [Message API Collection](https://odoo-synergysphere.postman.co/workspace/Team-Workspace~40f9dd26-5c9c-4e42-89e4-3fdad0248a13/collection/47243272-3dbddf1f-472c-4c4f-8691-599be9823d04?action=share&source=copy-link&creator=47243272)
+- **User:**  
+  [User API Documentation](https://documenter.getpostman.com/view/47243272/2sB3HkrM7p)
 
-- **Authentication:**  
-  [Auth API Collection](https://odoo-synergysphere.postman.co/workspace/Team-Workspace~40f9dd26-5c9c-4e42-89e4-3fdad0248a13/collection/47243272-56017a47-dd9c-4f68-8bee-6400268ddc57?action=share&source=copy-link&creator=47243272)
+- **Message:**  
+  [Message API Documentation](https://documenter.getpostman.com/view/47243272/2sB3HkrM7s)
 
-- **Notifications:**  
-  [Notification API Collection](https://odoo-synergysphere.postman.co/workspace/Team-Workspace~40f9dd26-5c9c-4e42-89e4-3fdad0248a13/collection/47243272-27ff60ee-05a2-429a-9943-6558c378c3ed?action=share&source=copy-link&creator=47243272)
+- **Notification:**  
+  [Notification API Documentation](https://documenter.getpostman.com/view/47243272/2sB3HkrM7r)
 
-- **Projects:**  
-  [Projects API Collection](https://odoo-synergysphere.postman.co/workspace/Team-Workspace~40f9dd26-5c9c-4e42-89e4-3fdad0248a13/collection/47243272-fc971ca6-0763-40d7-8b97-e8f615d5840b?action=share&source=copy-link&creator=47243272)
+- **Task:**  
+  [Task API Documentation](https://documenter.getpostman.com/view/47243272/2sB3HkrM7q)
 
-- **Tasks:**  
-  [Tasks API Collection](https://odoo-synergysphere.postman.co/workspace/Team-Workspace~40f9dd26-5c9c-4e42-89e4-3fdad0248a13/collection/47243272-e2330af6-736a-4627-bfe0-82fc56713073?action=share&source=copy-link&creator=47243272)
+- **Auth:**  
+  [Auth API Documentation](https://documenter.getpostman.com/view/47243272/2sB3HkrM7o)
 
 ---
 
@@ -113,14 +113,14 @@ All API endpoints are documented and testable via Postman.
    - Frontend: `npm run dev`
 
 5. **Test APIs:**
-   - Use the Postman collections above.
+   - Use the Postman documentation links above.
 
 ---
 
 ## 💡 Contributing
 
 - Fork the repo, create a feature branch, and submit a pull request.
-- For API changes, update the Postman collection and documentation.
+- For API changes, update the Postman documentation and code comments.
 
 ---
 
